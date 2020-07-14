@@ -1,0 +1,4 @@
+.idea
+lsp
+out
+!static/*.css

@@ -1,0 +1,8 @@
+*~
+.DS_Store
+
+compiled
+
+drafts/**/*.html
+drafts/**/*.css
+drafts/**/*.js
