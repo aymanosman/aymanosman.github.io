@@ -6,3 +6,4 @@ compiled
 drafts/**/*.html
 drafts/**/*.css
 drafts/**/*.js
+*.fasl
