@@ -1,0 +1,3 @@
+- Optimizing for throughput
+- thinking about limited resources
+- synchronous vs asynchronous calls
