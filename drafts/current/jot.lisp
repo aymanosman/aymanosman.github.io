@@ -112,19 +112,19 @@
   (dolist (token tokens)
     (ecase (token-type token)
       (:open-brace
-       (write-span stream "cyan" "{"))
+       (write-span stream "white" "{"))
       (:close-brace
-       (write-span stream "cyan" "}"))
+       (write-span stream "white" "}"))
       (:open-binary
-       (write-span stream "blue" "<<"))
+       (write-span stream "white" "<<"))
       (:close-binary
-       (write-span stream "blue" ">>"))
+       (write-span stream "white" ">>"))
       (:elipses
-       (write-span stream "pink" "..."))
+       (write-span stream "white" "..."))
       (:comma
        (write-span stream "white" ","))
       (:atom
-       (write-span stream "magenta" (format nil ":~a" (token-lexeme token))))
+       (write-span stream "cyan" (format nil ":~a" (token-lexeme token))))
       ((:whitespace :number)
        (write-span stream "yellow" (token-lexeme token))))))
 
