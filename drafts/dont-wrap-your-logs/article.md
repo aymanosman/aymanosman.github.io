@@ -1,4 +1,4 @@
-Elixir comes with a powerful and convenient logging facility exposed by the Logger module. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
+Elixir comes with a powerful and convenient logging facility exposed by the `Logger` module. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
 
 Basic usage of `Logger` may be enough for you, most of the time, but, sometimes, the need to customise some aspects of it will arise.
 
@@ -87,7 +87,7 @@ iex(1)> Example.work
 
 The reason this works is that the call to the macro `Logger.info/2` now expands in the context of the call to `MyLogger.info/2`, and so, source location information is preserved.
 
-As a demonstration of the kind of information that is available to a macro as it expands here is an alternative macro
+As a demonstration of the kind of information that is available to a macro as it expands, here is an alternative macro
 
 ```elixir
 defmodule MyLogger do
