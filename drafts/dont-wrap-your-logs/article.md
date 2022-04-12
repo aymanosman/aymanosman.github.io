@@ -1,10 +1,10 @@
 Elixir comes with a powerful and convenient logging facility exposed by the Logger module. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
 
-Basic usage of `Logger` may be enough for you most of the time, but sometimes the need will araise to customize some aspects of it.
+Basic usage of `Logger` may be enough for you, most of the time, but, sometimes, the need to customize some aspects of it will arise.
 
 One way of acheiving this is to wrap the lower level logging module. This is a completely natural thing to do. As a project grows, we will often wrap lower level functionality in order to enforce conventions and abstract repetitive code.
 
-So you would think that it would be completely reasonable to wrap Elixir's `Logger` module if it turned out you wanted to enforce some conventions on how you do logging throughout your project.
+So you would think that it would be completely reasonable to wrap Elixir's `Logger` module, if the need to customize logging were to arise.
 
 Here is the problem: you start to implement this solution by creating the following wrapper module:
 
@@ -52,9 +52,11 @@ As you can see, every log line reports the source of the log event as our new wr
 
 ## What is the problem?
 
-The problem is the Logging API functions, such as `Logger.info` and `Logger.debug`, are not functions but macros, and, in this context, it matters in what file you call them.
+The problem is the Logging API functions, such as `Logger.info` and `Logger.debug`, are not functions but macros, and, in this context, it matters where you call them.
 
-Macros know what files they are called in, they have access to that information through the `__CALLER__` special form. In fact, that is exactly how `Logger` captures this information.
+Macros know in what files they are called, they have access to that information through the `__CALLER__` special form. In fact, that is exactly how `Logger` captures this information.
+
+By placing the `Logger.info` call in one place (and calling it in a function), you have inadvertently signaled to the logging system that all log events originate from that one location.
 
 ## What is the solution?
 
