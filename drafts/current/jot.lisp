@@ -1,3 +1,6 @@
+(eval-when (:compile-toplevel)
+  (ql:quickload :spinneret))
+
 (defpackage #:jot
   (:use #:common-lisp))
 
@@ -30,7 +33,7 @@
                   (make-token :type :close-brace))
                  (#\:
                   (advance)
-                  (read-atom))
+                  (read-atom (1- pos)))
                  (#\,
                   (advance)
                   (make-token :type :comma))
@@ -71,11 +74,10 @@
                (unless (char= (peek) char)
                  (error message))
                (advance))
-             (read-atom ()
-               (let ((start pos))
-                 (loop :while (alpha-char-p (peek))
-                       :do (advance))
-                 (make-token :type :atom :lexeme (subseq source start pos))))
+             (read-atom (&optional (start pos))
+               (loop :while (alpha-char-p (peek))
+                     :do (advance))
+               (make-token :type :atom :lexeme (subseq source start pos)))
              (read-number ()
                (let ((start pos))
                  (loop :while (digit-char-p (peek))
@@ -96,6 +98,10 @@
     (with-open-file (stream "example.html" :direction :output :if-exists :supersede)
       (format stream "<!doctype html>")
       (format stream "<html>")
+      (format stream "<head>")
+      (format stream "<meta charset=\"UTF-8\">")
+      ;; <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      (format stream "</head>")
       (format stream "<body>")
       (format stream "<pre style=\"background-color: black;\">")
       (format stream "<code>")
@@ -124,7 +130,7 @@
       (:comma
        (write-span stream "white" ","))
       (:atom
-       (write-span stream "cyan" (format nil ":~a" (token-lexeme token))))
+       (write-span stream "cyan" (token-lexeme token)))
       ((:whitespace :number)
        (write-span stream "yellow" (token-lexeme token))))))
 
