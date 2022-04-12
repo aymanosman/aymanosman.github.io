@@ -1,10 +1,10 @@
 Elixir comes with a powerful and convenient logging facility exposed by the Logger module. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
 
-Basic usage of `Logger` may be enough for you, most of the time, but, sometimes, the need to customize some aspects of it will arise.
+Basic usage of `Logger` may be enough for you, most of the time, but, sometimes, the need to customise some aspects of it will arise.
 
-One way of acheiving this is to wrap the lower level logging module. This is a completely natural thing to do. As a project grows, we will often wrap lower level functionality in order to enforce conventions and abstract repetitive code.
+One way of achieving this is to wrap the lower level logging module. This is a completely natural thing to do. As a project grows, we will often wrap lower level functionality in order to enforce conventions and abstract repetitive code.
 
-So you would think that it would be completely reasonable to wrap Elixir's `Logger` module, if the need to customize logging were to arise.
+So you would think that it would be completely reasonable to wrap Elixir's `Logger` module, if the need to customise logging were to arise.
 
 Here is the problem: you start to implement this solution by creating the following wrapper module:
 
@@ -56,11 +56,11 @@ The problem is the Logging API functions, such as `Logger.info` and `Logger.debu
 
 Macros know in what files they are called, they have access to that information through the `__CALLER__` special form. In fact, that is exactly how `Logger` captures this information.
 
-By placing the `Logger.info` call in one place (and calling it in a function), you have inadvertently signaled to the logging system that all log events originate from that one location.
+By placing the `Logger.info` call in one place (and calling it in a function), you have inadvertently signalled to the logging system that all log events originate from that one location.
 
 ## What is the solution?
 
-Don't wrap the logging macros at all. You can probably achieve what you want by some other means. Look at the documentation for [`Custom Formatting`](https://hexdocs.pm/logger/1.13/Logger.Backends.Console.html#module-custom-formatting) to customize how a log event is serialized into a log line. If the Elixir logger is not flexible enough for you, consider looking at the lower level [Erlang Logger](https://www.erlang.org/doc/apps/kernel/logger_chapter.html) for options.
+Don't wrap the logging macros at all. You can probably achieve what you want by some other means. Look at the documentation for [`Custom Formatting`](https://hexdocs.pm/logger/1.13/Logger.Backends.Console.html#module-custom-formatting) to customise how a log event is serialised into a log line. If the Elixir logger is not flexible enough for you, consider looking at the lower level [Erlang Logger](https://www.erlang.org/doc/apps/kernel/logger_chapter.html) for options.
 
 ## I really want to wrap logging calls
 
