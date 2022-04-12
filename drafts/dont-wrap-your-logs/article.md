@@ -1,0 +1,118 @@
+Elixir comes with a powerful and convenient logging facility exposed by the Logger `module`. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
+
+Basic usage of `Logger` is enough for most projects, but inevitably people will feel the need to customize some aspects of how their logging is done.
+
+In larger codebases it is natural to want to wrap lower level functionality in order to make it easier to enforce a convention or, simply, to abstract away repetitive code.
+
+So you would think that it would be reasonable to wrap Elixir's `Logger` module if it turned out you wanted to enforce some conventions on how you do logging throughout your project.
+
+Here is the problem: say you decide to implement this by creating the following wrapper module:
+
+```elixir
+defmodule MyLogger do
+  require Logger
+  def info(message, metadata \\ []) do
+    Logger.info("[myprefix] " <> message, metadata)
+  end
+end
+```
+
+at first, everything seems to be working fine. you call this new wrapper function from another module and confirm that it is working as expected
+
+```elixir
+defmodule Example do
+  def work() do
+    MyLogger.info("working...")
+  end
+end
+```
+
+```
+iex(2)> Example.work
+
+11:38:16.428 [info]  [myprefix] working ...
+```
+
+the problem is discovered when you decide to include source location information alongside the ordinary log message.
+
+```elixir
+import Config
+
+config :logger, :console,
+  metadata: [:file, :function, :module]
+```
+
+```
+iex(1)> Example.work
+
+14:00:03.912 file=lib/my_logger.ex function=info/2 module=MyLogger [info]  [myprefix] working ...
+```
+
+every log line will report the source of the log event as our new wrapping code. Not what we wanted.
+
+## What is the problem?
+
+[the logging macros]
+[capture source location information from the place they were used]
+
+-- The problem is the Logging API functions, such as `info` and `debug`, are not functions but macros, and it matters in what files they are called.
+
+The problem is we've wrapped the logging [macro](https://hexdocs.pm/logger/1.13/Logger.html#info/2) that was carefull to capture source location information at the call site with a function (that can do no such thing).
+
+
+## What is the solution?
+
+Don't wrap the logging macros at all. You can probably achieve what you want by some other means, look at the documentation for [`Custom Formatting`](https://hexdocs.pm/logger/1.13/Logger.Backends.Console.html#module-custom-formatting) to customize how a log event is serialized into a log line. If the Elixir logger is not flexible enough for you, consider looking at the lower level [Erlang Logger](https://www.erlang.org/doc/apps/kernel/logger_chapter.html) for options.
+
+## I really want to wrap logging calls
+
+If you insist on wrapping calls to the Elixir logger, then wrap it in a macro.
+
+```elixir
+defmodule MyLogger do
+  # I don't recommend this
+  defmacro info(message, metadata \\ []) do
+    quote do
+      require Logger
+      Logger.info("[myprefix] " <> unquote(message), unquote(metadata))
+    end
+  end
+end
+
+```
+
+```
+iex(1)> Example.work
+
+13:09:48.324 file=lib/example.ex function=work/0 module=Example [info]  [myprefix] working ...
+```
+
+The reason this works is that the call to the macro `Logger.info/2` now expands in the context of the call to `MyLogger.info/2`, and so, source location information is preserved.
+
+As a demonstration of the kind of information that is available to a macro as it expands here is an alternative macro
+
+```elixir
+defmodule MyLogger do
+  defmacro info(message, metadata \\ []) do
+    env = __CALLER__
+
+    quote bind_quoted: [
+            message: message,
+            metadata: metadata,
+            file: env.file,
+            line: env.line
+          ] do
+      require Logger
+
+      Logger.info("source=#{Path.basename(file)}:#{line} #{message}", metadata)
+    end
+  end
+end
+
+```
+
+```
+iex(3)> Example.work
+
+13:20:14.575 [info]  source=example.ex:5 working ...
+```
