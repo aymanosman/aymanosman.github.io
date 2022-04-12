@@ -1,12 +1,12 @@
-Elixir comes with a powerful and convenient logging facility exposed by the Logger `module`. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
+Elixir comes with a powerful and convenient logging facility exposed by the Logger module. It is used universally in Elixir projects, which makes the subject of logging far more approachable in Elixir than in most other languages, where the logging story is far less straightforward.
 
-Basic usage of `Logger` is enough for most projects, but inevitably people will feel the need to customize some aspects of how their logging is done.
+Basic usage of `Logger` may be enough for you most of the time, but sometimes the need will araise to customize some aspects of it.
 
-In larger codebases it is natural to want to wrap lower level functionality in order to make it easier to enforce a convention or, simply, to abstract away repetitive code.
+One way of acheiving this is to wrap the lower level logging module. This is a completely natural thing to do. As a project grows, we will often wrap lower level functionality in order to enforce conventions and abstract repetitive code.
 
-So you would think that it would be reasonable to wrap Elixir's `Logger` module if it turned out you wanted to enforce some conventions on how you do logging throughout your project.
+So you would think that it would be completely reasonable to wrap Elixir's `Logger` module if it turned out you wanted to enforce some conventions on how you do logging throughout your project.
 
-Here is the problem: say you decide to implement this by creating the following wrapper module:
+Here is the problem: you start to implement this solution by creating the following wrapper module:
 
 ```elixir
 defmodule MyLogger do
@@ -17,7 +17,7 @@ defmodule MyLogger do
 end
 ```
 
-at first, everything seems to be working fine. you call this new wrapper function from another module and confirm that it is working as expected
+At first, everything seems to be working fine. You call this new wrapper function from another module and confirm that it is working as expected
 
 ```elixir
 defmodule Example do
@@ -33,7 +33,7 @@ iex(2)> Example.work
 11:38:16.428 [info]  [myprefix] working ...
 ```
 
-the problem is discovered when you decide to include source location information alongside the ordinary log message.
+The problem is discovered when you decide to include source location information alongside the ordinary log message.
 
 ```elixir
 import Config
@@ -48,21 +48,17 @@ iex(1)> Example.work
 14:00:03.912 file=lib/my_logger.ex function=info/2 module=MyLogger [info]  [myprefix] working ...
 ```
 
-every log line will report the source of the log event as our new wrapping code. Not what we wanted.
+As you can see, every log line reports the source of the log event as our new wrapping code. This is not what you wanted.
 
 ## What is the problem?
 
-[the logging macros]
-[capture source location information from the place they were used]
+The problem is the Logging API functions, such as `Logger.info` and `Logger.debug`, are not functions but macros, and, in this context, it matters in what file you call them.
 
--- The problem is the Logging API functions, such as `info` and `debug`, are not functions but macros, and it matters in what files they are called.
-
-The problem is we've wrapped the logging [macro](https://hexdocs.pm/logger/1.13/Logger.html#info/2) that was carefull to capture source location information at the call site with a function (that can do no such thing).
-
+Macros know what files they are called in, they have access to that information through the `__CALLER__` special form. In fact, that is exactly how `Logger` captures this information.
 
 ## What is the solution?
 
-Don't wrap the logging macros at all. You can probably achieve what you want by some other means, look at the documentation for [`Custom Formatting`](https://hexdocs.pm/logger/1.13/Logger.Backends.Console.html#module-custom-formatting) to customize how a log event is serialized into a log line. If the Elixir logger is not flexible enough for you, consider looking at the lower level [Erlang Logger](https://www.erlang.org/doc/apps/kernel/logger_chapter.html) for options.
+Don't wrap the logging macros at all. You can probably achieve what you want by some other means. Look at the documentation for [`Custom Formatting`](https://hexdocs.pm/logger/1.13/Logger.Backends.Console.html#module-custom-formatting) to customize how a log event is serialized into a log line. If the Elixir logger is not flexible enough for you, consider looking at the lower level [Erlang Logger](https://www.erlang.org/doc/apps/kernel/logger_chapter.html) for options.
 
 ## I really want to wrap logging calls
 
@@ -70,7 +66,7 @@ If you insist on wrapping calls to the Elixir logger, then wrap it in a macro.
 
 ```elixir
 defmodule MyLogger do
-  # I don't recommend this
+  # I don't recommend doing this
   defmacro info(message, metadata \\ []) do
     quote do
       require Logger
