@@ -1,0 +1,496 @@
+* A Phoenix Component Tutorial
+
+What you will make: a reusable component, that represents steps in a process with completions states
+
+What you will learn:
+- basics of phoenix components and heex templates
+- how to use :for for more convienent rendering of multiple elements
+- how to use slots
+- how to use attr annotations
+- a little tailwind css
+
+Assumed Knowledge:
+- html & css
+- tailwind css classes won't be explained, but the desired affect will be
+- how to setup a project with phoenix and LiveView
+
+the end result
+
+[image steps-3.png]
+
+** Intro to heex and phoenix components
+
+skip this section if you are already familiar with heex
+
+Note:
+HEEx is actually an extension of EEx,
+Elixir's templating engine.
+I will treat them as one, for the purpose of this article.
+
+heex provides a way to render literal text
+    ~<span>hello world</span>~
+as well as interpolate or embed elixir code into the text
+    ~<span>hello <%= name %></span>~
+
+It let's you embed more than just variables,
+and has support for embedding elixir control constructs
+such as if,cond,case and for, in order to express more complex templates.
+
+#+begin_src heex
+<span>
+  <%= for thing <- ["one", "two", "three"] do %>
+    <span><%= thing %></span>
+  <% end %>
+</span>
+#+end_src
+results in
+
+#+begin_src html
+<span>
+  <span>one</span>
+  <span>two</span>
+  <span>three</span>
+</span>
+#+end_src
+
+HEEx is HTML-aware, and will actually parse and validate the structure of
+the HTML contained in the template.
+That means making sure tags are properly closed and the syntax of attributes is respected.
+To that end, there is a special syntax for interpolating values in attributes.
+it is not valid to write ~<span class="<%= color %>">~.
+Instead, one must write ~<span class={color}>hello world</span>~.
+
+HEEx provides some conveniences to express patterns like the for loop above.
+One could write instead:
+
+#+begin_src heex
+<span>
+  <span :for={thing <- ["one", "two", "three"]}><%= thing %></span>
+</span>
+#+end_src
+
+Phoenix Components are just functions that return HEEx templates.
+They receive a mandatory single argument that must be called ~assigns~.
+
+They are invoked inside of other templates using a special syntax.
+For functions which are in scope, one can use the following syntax.
+
+    ~<.greeting name="Ayman" />~
+
+It is also possible to invoke a function component from an external module.
+
+    ~<Other.greeting name="Ayman" />~
+
+The above component could be defined like this:    
+
+#+begin_src elixir
+attr :name, :string, default: "world"
+
+def greeting(assigns) do
+  ~H"""
+  <span>hello <%= @name %></span>
+  """
+end
+#+end_src
+
+Notice the ~@~ sign in ~@name~. It is just a shorthand for ~assigns.name~.
+
+Function components can be annotated with the ~attr~ macro,
+which let's us define the attributes which the component accepts.
+This is useful for providing defaults, error checking as well as documentation.
+
+Components can also be annotated with the "slots" that it accepts,
+which brings us to the final feature we are going to talk about.
+
+Just as ordinary html elements,
+phoenix components can be passed child elements.
+
+#+begin_src heex
+<.greeting excited>Ayman</.greeting>
+#+end_src
+
+These child elements are exposed to the component as "slots".
+
+For example, we could define the component like this:
+
+#+begin_src elixir
+attr :excited, :boolean, default: false
+slot :inner_block, required: true
+
+def greeting(assigns) do
+  ~H"""
+  <span>hello <%= render_slot(@inner_block) %><span :if={@excited}>!</span></span> 
+  """
+end
+#+end_src
+
+There are a few things to note here.
+
+1. Slots are passed in as ordinary "assigns", so attributes and slots share a namespace.
+2. The ~inner_block~ slot is the name given to children passed in to the component
+3. I used the :if directive to conditionaly render an element.
+
+What we did above was pass in a unnamed slot or the "default" slot, called ~inner_block~.
+
+To pass in a named slot, use the syntax ~<:my_slot>~. Like so:
+
+#+begin_src heex
+<.greeting>
+  Ayman
+  <:title>Mr.</:title>
+</.greeting>
+#+end_src
+
+#+begin_src elixir
+slot :title
+slot :inner_block, required: true
+
+def greeting(assigns) do
+  ~H"""
+  <span>hello <%= render_slot(@title) %><%= render_slot(@inner_block) %></span>
+  """
+end
+#+end_src
+
+
+** Begin
+
+For an ordered list of steps,
+it is natural to use the ~ol~ and ~li~ tags for markup.
+
+Let's see an example of using the component we will define
+before we embark on the implementation.
+
+The component, that we will call ~step_list~,
+is just like an ordinary list which can contain multiple items.
+
+#+begin_src heex
+<.step_list>
+  <:item>...</:item>
+  <:item>...</:item>
+</.step_list>
+#+end_src
+
+Which leads to the initial definition below:
+
+#+begin_src diff
++ slot :item
++ 
++ def step_list(assigns) do
++   ~H"""
++   <ol>
++     <li :for={item <- @item}>
++       <%= render_slot(item) %>
++     </li>
++   </ol>
++   """
++ end
+#+end_src
+
+add padding between list items
+
+#+begin_src diff
+     <ol>
+-     <li :for={item <- @item}>
++     <li :for={item <- @item} class="pb-10">
+#+end_src
+
+Each item is composed of a "bullet point"
+and the contents of the item.
+The bullet point is a circle that can be in one of three states,
+which is described later.
+
+First, we create a flex container.
+
+#+begin_src diff
+      <li :for={item <- @item} class="pb-10">
++       <div class="flex items-start">
+#+end_src
+
+For the bullet point, we will have a placeholder that we will replace later.
+For now, we will render what will eventually be the default state of the bullet.
+
+#+begin_src diff
+      <li :for={item <- @item} class="pb-10">
+        <div class="flex items-start">
++         <!-- bullet point -->
++         <span class="h-8 w-8 rounded-full border-2 border-gray-300"></span>
+#+end_src
+
+The item content goes beside the bullet,
+with a little bit of space separating the two.
+
+#+begin_src diff
+      <li :for={item <- @item} class="pb-10">
+        <div class="flex items-start">
+          <!-- bullet point -->
+          <span class="h-8 w-8 rounded-full border-2 border-gray-300"></span>
++         <!-- item content -->
++         <span class="ml-4">
++           <%= render_slot(item) %>
+#+end_src
+
+Next is drawing the connecting lines between the bullet points.
+To do that we will draw a line emanating from the bullet point downwards
+Each bullet point will need this except the last.
+We keep track of the index of each item and check it against the index of the last item.
+
+First we introduce a new assign:
+
+#+begin_src diff
++ assigns = assign(assigns, last_index: length(assigns.item) - 1)
+
+  ~H"""
+   <ol>
+#+end_src
+
+Next, we keep track of the index of each item.
+
+#+begin_src diff
+-   <li :for={item <- @item} class="pb-10">
++   <li :for={{item, index} <- Enum.with_index(@item)} class="pb-10">
+#+end_src
+
+The connecting lines will be absolutely positioned relative to the ~li~ element.
+
+#+begin_src diff
+-   <li :for={{item, index} <- Enum.with_index(@item)} class="pb-10">
++   <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
+#+end_src
+
+The line appears in every item except the last.
+
+#+begin_src diff
+    <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
++     <div :if={index != @last_index} class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
+#+end_src
+
+As it stands, the lines are rendering above the bullet points,
+which is not what we want.
+We fix this by adjusting the z-index and background color of the bullets.
+
+#+begin_src diff
+          <!-- bullet point -->
+-         <span class="h-8 w-8 rounded-full border-2 border-gray-300"></span>
++         <span class="z-10 h-8 w-8 rounded-full border-2 border-gray-300 bg-white"></span>
+#+end_src
+
+This is what we have so far.
+
+#+begin_src elixir
+    assigns = assign(assigns, last_index: length(assigns.item) - 1)
+    
+    ~H"""
+    <ol>
+      <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
+        <div :if={index != @last_index} class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
+        </div>
+        <div class="flex items-start">
+          <!-- bullet point -->
+          <span class="z-10 h-8 w-8 rounded-full border-2 border-gray-300 bg-white"></span>
+          <!-- item content -->
+          <span class="ml-4">
+            <%= render_slot(item) %>
+          </span>
+        </div>
+      </li>
+    </ol>
+    """
+#+end_src
+
+[image]
+
+The final thing to implement is the different bullet point states.
+
+There are 3 states: complete, current and upcoming.
+
+To indicate which step is current,
+we will use an attribute on the item.
+
+The updated slot definition.
+
+#+begin_src diff
+- slot :item
++ slot :item do
++   attr :current, :boolean
++ end
+#+end_src
+
+and introduce a new assign ~:current_index~,
+which will hold the index of the item marked "current".
+
+#+begin_src diff
+- assigns = assign(assigns, last_index: length(assigns.item) - 1)
++ assigns =
++   assign(assigns,
++     last_index: length(assigns.item) - 1,
++     current_index: Enum.find_index(assigns.item, fn item -> item[:current] end) || -1
++   )
+
+  ~H"""
+   <ol>
+#+end_src
+
+We default =current_index= to -1.
+This is because of how we infer the status of each item.
+Any item with an index less than =current_index= is completed,
+and any item with an index greater than =current_index= is upcoming.
+And because -1 is less than any item index,
+the default is to render all items as upcoming.
+
+Now to make use of this information in rendering the connecting lines.
+
+We want every line leading up to the current step to be colored,
+while the remaining lines stay gray.
+
+#+begin_src diff
+    <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
+-     <div :if={index != @last_index} class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
++     <div
++       :if={index != @last_index}
++       class={[
++         "absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5",
++         cond do
++           index < @current_index -> "bg-indigo-600"
++           true -> "bg-gray-300"
++         end
++       ]}
++     >
+#+end_src
+
+Finally, we will extract the bullet point into its own component.
+See the end of the article for the implementation.
+
+#+begin_src elixir
+attr :status, :atom, values: [:complete, :current, :upcoming]
+
+defp step_list_bullet(assigns) do
+  case assigns.status do
+    :complete -> ...
+    :current -> ...
+    :upcoming -> ...
+  end 
+end
+#+end_src
+
+And replace the placeholder...
+
+#+begin_src diff
+-         <!-- bullet point -->
+-         <span class="z-10 h-8 w-8 rounded-full border-2 border-gray-300 bg-white"></span>
++         <.step_list_bullet status={
++           cond do
++             index < @current_index -> :complete
++             index == @current_index -> :current
++             true -> :upcoming
++           end
++         } />
+#+end_src
+
+The component is complete.
+
+Here is a more complete example of using it.
+
+#+begin_src elixir
+    ~H"""
+    <.step_list>
+      <:item>
+        <span class="flex flex-col">
+          <span class="text-sm font-medium">Get ingredients</span>
+          <span class="text-sm text-gray-500">Eggs, flour, etc.</span>
+        </span>
+      </:item>
+      <:item current>
+        <span class="flex flex-col">
+          <span class="text-sm font-medium">Make cake</span>
+          <span class="text-sm text-gray-500">Mix it up. Put it in oven.</span>
+        </span>
+      </:item>
+      <:item>
+        <span class="flex flex-col">
+          <span class="text-sm font-medium">Eat it</span>
+          <span class="text-sm text-gray-500">Open mouth. Put it in mouth.</span>
+        </span>
+      </:item>
+    </.step_list>
+    """
+#+end_src
+
+[image]
+
+
+The final code.
+
+#+begin_src elixir
+slot :item do
+  attr :current, :boolean
+end
+
+def step_list(assigns) do
+  assigns =
+    assign(assigns,
+      last_index: length(assigns.item) - 1,
+      current_index: Enum.find_index(assigns.item, fn item -> item[:current] end) || -1
+    )
+
+  ~H"""
+    <ol>
+      <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
+        <div
+          :if={index != @last_index}
+          class={[
+            "absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5",
+            cond do
+              index < @current_index -> "bg-indigo-600"
+              true -> "bg-gray-300"
+            end
+          ]}
+        >
+        </div>
+        <div class="flex items-start">
+          <.step_list_bullet status={
+            cond do
+              index < @current_index -> :complete
+              index == @current_index -> :current
+              true -> :upcoming
+            end
+          } />
+          <!-- item content -->
+          <span class="ml-4">
+            <%= render_slot(item) %>
+          </span>
+        </div>
+      </li>
+    </ol>
+  """
+end
+
+attr :status, :atom, values: [:complete, :current, :upcoming]
+
+defp step_list_bullet(assigns) do
+  case assigns.status do
+    :complete ->
+      ~H"""
+      <span class="z-10 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-600">
+        <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </span>
+      """
+
+    :current ->
+      ~H"""
+      <span class="z-10 h-8 w-8 flex items-center justify-center rounded-full border-2 border-indigo-600 bg-white"></span>
+      """
+
+    :upcoming ->
+      ~H"""
+      <span class="z-10 h-8 w-8 flex items-center justify-center rounded-full border-2 border-gray-300 bg-white"></span>
+      """
+  end
+end
+#+end_src
