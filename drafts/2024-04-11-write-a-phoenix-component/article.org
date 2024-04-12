@@ -17,7 +17,7 @@ Assumed Knowledge:
 the end result
 
 #+begin_html
-<img src="steps-3.png" width="300" />
+<img src="steps-3.png" width="400" />
 #+end_html
 
 ** Intro to heex and phoenix components
@@ -234,6 +234,10 @@ with a little bit of space separating the two.
 +           <%= render_slot(item) %>
 #+end_src
 
+#+begin_html
+<img src="steps-0.png" width="400" />
+#+end_html
+
 Next is drawing the connecting lines between the bullet points.
 To do that we will draw a line emanating from the bullet point downwards
 Each bullet point will need this except the last.
@@ -302,7 +306,9 @@ This is what we have so far.
     """
 #+end_src
 
-[image]
+#+begin_html
+<img src="steps-1.png" width="400" />
+#+end_html
 
 The final thing to implement is the different bullet point states.
 
@@ -320,8 +326,9 @@ The updated slot definition.
 + end
 #+end_src
 
-and introduce a new assign ~:current_index~,
-which will hold the index of the item marked "current".
+And introduce a new assign which will hold the index of the "current" item.
+We calculate ~:current_index~ by finding the first item that posseses the attribute ~:current~.
+
 
 #+begin_src diff
 - assigns = assign(assigns, last_index: length(assigns.item) - 1)
@@ -337,8 +344,8 @@ which will hold the index of the item marked "current".
 
 We default =current_index= to -1.
 This is because of how we infer the status of each item.
-Any item with an index less than =current_index= is completed,
-and any item with an index greater than =current_index= is upcoming.
+Any item with an index less than =current_index= is "complete",
+and any item with an index greater than =current_index= is "upcoming".
 And because -1 is less than any item index,
 the default is to render all items as upcoming.
 
@@ -362,8 +369,12 @@ while the remaining lines stay gray.
 +     >
 #+end_src
 
+#+begin_html
+<img src="steps-2.png" width="400" />
+#+end_html
+
 Finally, we will extract the bullet point into its own component.
-See the end of the article for the implementation.
+See the end of the article for the full implementation.
 
 #+begin_src elixir
 attr :status, :atom, values: [:complete, :current, :upcoming]
@@ -393,7 +404,7 @@ And replace the placeholder...
 
 The component is complete.
 
-Here is a more complete example of using it.
+Here is an extended example of using it.
 
 #+begin_src elixir
     ~H"""
@@ -420,7 +431,9 @@ Here is a more complete example of using it.
     """
 #+end_src
 
-[image]
+#+begin_html
+<img src="steps-3.png" width="400" />
+#+end_html
 
 
 The final code.
