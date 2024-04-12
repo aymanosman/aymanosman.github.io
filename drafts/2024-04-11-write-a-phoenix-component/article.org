@@ -16,9 +16,9 @@ Assumed Knowledge:
 
 the end result
 
-#+attr_html :width 300px
-[[./steps-3.png]]
-
+#+begin_html
+<img src="steps-3.png" width="300" />
+#+end_html
 
 ** Intro to heex and phoenix components
 
