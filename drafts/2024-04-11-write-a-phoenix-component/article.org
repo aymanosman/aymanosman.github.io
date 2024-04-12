@@ -22,11 +22,9 @@ the end result
 
 ** Intro to heex and phoenix components
 
-#+begin_html
-<aside>
-  Skip this section if you are already familiar with HEEx
-</aside>
-#+end_html
+#+begin_quote
+Skip this section if you are already familiar with HEEx
+#+end_quote
 
 Note:
 HEEx is actually an extension of EEx,
