@@ -22,7 +22,11 @@ the end result
 
 ** Intro to heex and phoenix components
 
-skip this section if you are already familiar with heex
+#+begin_html
+<aside>
+  Skip this section if you are already familiar with HEEx
+</aside>
+#+end_html
 
 Note:
 HEEx is actually an extension of EEx,
