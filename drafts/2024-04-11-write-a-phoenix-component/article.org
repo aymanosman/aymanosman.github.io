@@ -287,21 +287,8 @@ First we introduce a new assign:
 #+end_src
 
 #+begin_quote
-I left out of the introduction to HEEx,
-the concept of "change tracking".
-HEEx encourages you to define variables to be used in templates
-inside the ~assigns~ structure.
-And discourages (although, does not forbid)
-accessing arbitrary variables inside of templates.
-This is due to the change tracking mechanism
-that calculates what has changed from one rending of a template to the next.
-#+end_quote
-
-#+begin_quote
-Why do I update the ~assigns~ structure
-instead of simply defining a new variable?
-If you don't do it this way you will get a warning regarding "change tracking".
-For brevity, I will leave an explanation of this out of this article.
+For why I don't simply hold ~last_index~ in a variable,
+see [[https://hexdocs.pm/phoenix_live_view/assigns-eex.html#change-tracking][Change Tracking]]
 #+end_quote
 
 Next, we keep track of the index of each item.
