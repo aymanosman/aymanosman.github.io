@@ -16,9 +16,9 @@ Credit: tailwindui.com for the design this is based on
 
 What you will learn:
 - basics of Phoenix components and HEEx templates
-- how to use `:for` and `:if` for more concise tempaltes.
+- how to use ~:for~ and ~:if~ for more concise tempaltes.
 - how to use slots
-- how to use `attr` and `slot` annotations
+- how to use ~attr~ and ~slot~ annotations
 
 Assumed Knowledge:
 - HTML & CSS
@@ -44,7 +44,7 @@ as well as interpolate or embed elixir code into the text
 
 It let's you embed more than just variables,
 and has support for embedding elixir control constructs
-such as if,cond,case and for, in order to express more complex templates.
+such as ~if~, ~cond~, ~case~ and ~for~, in order to express more complex templates.
 
 #+begin_src heex
 <span>
@@ -67,8 +67,13 @@ HEEx is HTML-aware, and will actually parse and validate the structure of
 the HTML contained in the template.
 That means making sure tags are properly closed and the syntax of attributes is respected.
 To that end, there is a special syntax for interpolating values in attributes.
-it is not valid to write ~<span class="<%= color %>">~.
-Instead, one must write ~<span class={color}>hello world</span>~.
+it is not valid to write
+
+~<span class="<%= color %>">~
+
+Instead, one must write
+
+~<span class={color}>hello world</span>~
 
 HEEx provides some conveniences to express patterns like the for loop above.
 One could write instead:
