@@ -1,39 +1,45 @@
-* A Phoenix Component Tutorial
+* Let's write a Phoenix Component
 
-What you will make: a reusable component, that represents steps in a process with completions states
+What you will make:
+a reusable component,
+that represents steps in a process.
 
-What you will learn:
-- basics of phoenix components and heex templates
-- how to use :for for more convienent rendering of multiple elements
-- how to use slots
-- how to use attr annotations
-- a little tailwind css
-
-Assumed Knowledge:
-- html & css
-- tailwind css classes won't be explained, but the desired affect will be
-- how to setup a project with phoenix and LiveView
-
-the end result
+Here is what the end result will be.
 
 #+begin_html
 <img src="steps-3.png" width="400" />
 #+end_html
 
-** Intro to heex and phoenix components
-
 #+begin_quote
-Skip this section if you are already familiar with HEEx
+Credit: tailwindui.com for the design this is based on
 #+end_quote
 
+What you will learn:
+- basics of Phoenix components and HEEx templates
+- how to use `:for` and `:if` for more concise tempaltes.
+- how to use slots
+- how to use `attr` and `slot` annotations
+
+Assumed Knowledge:
+- HTML & CSS
+- Tailwind CSS classes won't be explained, but the desired affect will be
+- how to setup a project with phoenix and LiveView
+
+** Intro to HHEx and Phoenix Components
+
+#+begin_quote
 Note:
 HEEx is actually an extension of EEx,
 Elixir's templating engine.
 I will treat them as one, for the purpose of this article.
+#+end_quote
 
-heex provides a way to render literal text
+HEEx provides a way to render literal text
+
     ~<span>hello world</span>~
+
 as well as interpolate or embed elixir code into the text
+
     ~<span>hello <%= name %></span>~
 
 It let's you embed more than just variables,
