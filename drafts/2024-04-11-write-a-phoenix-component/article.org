@@ -117,8 +117,8 @@ This is useful for providing defaults, error checking as well as documentation.
 Components can also be annotated with the "slots" that it accepts,
 which brings us to the final feature we are going to talk about.
 
-Just as ordinary html elements,
-phoenix components can be passed child elements.
+Just as ordinary HTML elements,
+Phoenix components can be passed child elements.
 
 #+begin_src heex
 <.greeting excited>Ayman</.greeting>
@@ -139,13 +139,33 @@ def greeting(assigns) do
 end
 #+end_src
 
+The above is a little hard to read,
+so here it is formatted over multiple lines.
+
+#+begin_src heex
+<span>
+  hello
+  <%= render_slot(@inner_block) %>
+  <span :if={@excited}>
+    !
+  </span>
+</span> 
+#+end_src
+
 There are a few things to note here.
 
-1. Slots are passed in as ordinary "assigns", so attributes and slots share a namespace.
+1. Slots and attrs are both passed in via ~assigns~, so they share a namespace.
 2. The ~inner_block~ slot is the name given to children passed in to the component
-3. I used the :if directive to conditionaly render an element.
+3. I used the ~:if~ directive to conditionaly render an element.
+   It is equivalent to the much more verbose:
 
-What we did above was pass in a unnamed slot or the "default" slot, called ~inner_block~.
+   #+begin_src heex
+   <%= if @excited do %>
+     <span>!</span>
+   <% end %>
+   #+end_src
+
+What we did above was pass in an unnamed slot or the "default" slot, called ~inner_block~.
 
 To pass in a named slot, use the syntax ~<:my_slot>~. Like so:
 
