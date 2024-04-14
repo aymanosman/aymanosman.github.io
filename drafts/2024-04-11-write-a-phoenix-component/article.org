@@ -453,29 +453,27 @@ The component is complete.
 
 Here is the extended example of using it that appeared in the beginning of the article.
 
-#+begin_src elixir
-    ~H"""
-    <.step_list>
-      <:item>
-        <span class="flex flex-col">
-          <span class="text-sm font-medium">Get ingredients</span>
-          <span class="text-sm text-gray-500">Eggs, flour, etc.</span>
-        </span>
-      </:item>
-      <:item current>
-        <span class="flex flex-col">
-          <span class="text-sm font-medium">Make cake</span>
-          <span class="text-sm text-gray-500">Mix it up. Put it in oven.</span>
-        </span>
-      </:item>
-      <:item>
-        <span class="flex flex-col">
-          <span class="text-sm font-medium">Eat it</span>
-          <span class="text-sm text-gray-500">Open mouth. Put it in mouth.</span>
-        </span>
-      </:item>
-    </.step_list>
-    """
+#+begin_src heex
+<.step_list>
+  <:item>
+    <span class="flex flex-col">
+      <span class="text-sm font-medium">Get ingredients</span>
+      <span class="text-sm text-gray-500">Eggs, flour, etc.</span>
+    </span>
+  </:item>
+  <:item current>
+    <span class="flex flex-col">
+      <span class="text-sm font-medium">Make cake</span>
+      <span class="text-sm text-gray-500">Mix it up. Put it in oven.</span>
+    </span>
+  </:item>
+  <:item>
+    <span class="flex flex-col">
+      <span class="text-sm font-medium">Eat it</span>
+      <span class="text-sm text-gray-500">Open mouth. Put it in mouth.</span>
+    </span>
+  </:item>
+</.step_list>
 #+end_src
 
 #+begin_html
