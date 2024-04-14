@@ -25,7 +25,7 @@ Assumed Knowledge:
 - Tailwind CSS classes won't be explained, but the desired affect will be
 - how to setup a project with phoenix and LiveView
 
-** Intro to HHEx and Phoenix Components
+** Intro to HEEx and Phoenix Components
 
 #+begin_quote
 Note:
@@ -187,8 +187,10 @@ def greeting(assigns) do
 end
 #+end_src
 
+This concludes the short introduction to HEEx and Phoenix Components.
+Onto implementing the component.
 
-** Begin
+** Making the component
 
 For an ordered list of steps,
 it is natural to use the ~ol~ and ~li~ tags for markup.
@@ -197,7 +199,8 @@ Let's see an example of using the component we will define
 before we embark on the implementation.
 
 The component, that we will call ~step_list~,
-is just like an ordinary list which can contain multiple items.
+is just like an ordinary list
+which is a container of multiple items.
 
 #+begin_src heex
 <.step_list>
@@ -206,23 +209,23 @@ is just like an ordinary list which can contain multiple items.
 </.step_list>
 #+end_src
 
-Which leads to the initial definition below:
+This leads to the following, rough implementation:
 
-#+begin_src diff
-+ slot :item
-+ 
-+ def step_list(assigns) do
-+   ~H"""
-+   <ol>
-+     <li :for={item <- @item}>
-+       <%= render_slot(item) %>
-+     </li>
-+   </ol>
-+   """
-+ end
+#+begin_src elixir
+slot :item
+
+def step_list(assigns) do
+  ~H"""
+  <ol>
+    <li :for={item <- @item}>
+      <%= render_slot(item) %>
+    </li>
+  </ol>
+  """
+end
 #+end_src
 
-add padding between list items
+We begin by adding padding between the list items
 
 #+begin_src diff
      <ol>
@@ -242,8 +245,8 @@ First, we create a flex container.
 +       <div class="flex items-start">
 #+end_src
 
-For the bullet point, we will have a placeholder that we will replace later.
-For now, we will render what will eventually be the default state of the bullet.
+For the bullet point,
+we will just create a placeholder for now.
 
 #+begin_src diff
       <li :for={item <- @item} class="pb-10">
@@ -269,8 +272,8 @@ with a little bit of space separating the two.
 <img src="steps-0.png" width="400" />
 #+end_html
 
-Next is drawing the connecting lines between the bullet points.
-To do that we will draw a line emanating from the bullet point downwards
+Next we draw the connecting lines between the bullet points.
+To do that we draw a line emanating from the bullet point downwards.
 Each bullet point will need this except the last.
 We keep track of the index of each item and check it against the index of the last item.
 
@@ -283,6 +286,24 @@ First we introduce a new assign:
    <ol>
 #+end_src
 
+#+begin_quote
+I left out of the introduction to HEEx,
+the concept of "change tracking".
+HEEx encourages you to define variables to be used in templates
+inside the ~assigns~ structure.
+And discourages (although, does not forbid)
+accessing arbitrary variables inside of templates.
+This is due to the change tracking mechanism
+that calculates what has changed from one rending of a template to the next.
+#+end_quote
+
+#+begin_quote
+Why do I update the ~assigns~ structure
+instead of simply defining a new variable?
+If you don't do it this way you will get a warning regarding "change tracking".
+For brevity, I will leave an explanation of this out of this article.
+#+end_quote
+
 Next, we keep track of the index of each item.
 
 #+begin_src diff
@@ -291,16 +312,26 @@ Next, we keep track of the index of each item.
 #+end_src
 
 The connecting lines will be absolutely positioned relative to the ~li~ element.
+For that, we must add ~relative~ to the classes of the ~li~ element.
 
 #+begin_src diff
 -   <li :for={{item, index} <- Enum.with_index(@item)} class="pb-10">
 +   <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
 #+end_src
 
-The line appears in every item except the last.
+The line is simply a gray ~div~, absolutely positioned to appear below each bullet point.
 
 #+begin_src diff
     <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
++     <div class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
+#+end_src
+
+The line appears in every item except the last,
+so here we make use of the ~@last_index~ assign.
+
+#+begin_src diff
+    <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
+-     <div class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
 +     <div :if={index != @last_index} class="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300">
 #+end_src
 
@@ -346,9 +377,7 @@ The final thing to implement is the different bullet point states.
 There are 3 states: complete, current and upcoming.
 
 To indicate which step is current,
-we will use an attribute on the item.
-
-The updated slot definition.
+we will add a ~:current~ boolean attribute to the item slot.
 
 #+begin_src diff
 - slot :item
@@ -358,7 +387,7 @@ The updated slot definition.
 #+end_src
 
 And introduce a new assign which will hold the index of the "current" item.
-We calculate ~:current_index~ by finding the first item that posseses the attribute ~:current~.
+We calculate ~:current_index~ by finding the first item that posseses the ~:current~ attribute.
 
 
 #+begin_src diff
@@ -373,12 +402,12 @@ We calculate ~:current_index~ by finding the first item that posseses the attrib
    <ol>
 #+end_src
 
-We default =current_index= to -1.
+We default =:current_index= to -1.
 This is because of how we infer the status of each item.
 Any item with an index less than =current_index= is "complete",
 and any item with an index greater than =current_index= is "upcoming".
 And because -1 is less than any item index,
-the default is to render all items as upcoming.
+the default is to regard all items as upcoming.
 
 Now to make use of this information in rendering the connecting lines.
 
@@ -435,7 +464,7 @@ And replace the placeholder...
 
 The component is complete.
 
-Here is an extended example of using it.
+Here is the extended example of using it that appeared in the beginning of the article.
 
 #+begin_src elixir
     ~H"""
@@ -467,7 +496,7 @@ Here is an extended example of using it.
 #+end_html
 
 
-The final code.
+** Final Code
 
 #+begin_src elixir
 slot :item do
