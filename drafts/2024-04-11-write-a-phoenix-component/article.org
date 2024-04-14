@@ -22,7 +22,7 @@ What you will learn:
 
 Assumed Knowledge:
 - HTML & CSS
-- Tailwind CSS classes won't be explained, but the desired affect will be
+- Tailwind CSS classes won't be explained, but the desired effect will be
 - how to setup a project with phoenix and LiveView
 
 ** Intro to HEEx and Phoenix Components
@@ -42,7 +42,7 @@ as well as interpolate or embed elixir code into the text
 
     ~<span>hello <%= name %></span>~
 
-It let's you embed more than just variables,
+It lets you embed more than just variables,
 and has support for embedding elixir control constructs
 such as ~if~, ~cond~, ~case~ and ~for~, in order to express more complex templates.
 
@@ -53,6 +53,7 @@ such as ~if~, ~cond~, ~case~ and ~for~, in order to express more complex templat
   <% end %>
 </span>
 #+end_src
+
 results in
 
 #+begin_src html
@@ -67,11 +68,11 @@ HEEx is HTML-aware, and will actually parse and validate the structure of
 the HTML contained in the template.
 That means making sure tags are properly closed and the syntax of attributes is respected.
 To that end, there is a special syntax for interpolating values in attributes.
-it is not valid to write
+It is not valid to write:
 
 ~<span class="<%= color %>">~
 
-Instead, one must write
+instead, one must write
 
 ~<span class={color}>hello world</span>~
 
@@ -111,7 +112,7 @@ end
 Notice the ~@~ sign in ~@name~. It is just a shorthand for ~assigns.name~.
 
 Function components can be annotated with the ~attr~ macro,
-which let's us define the attributes which the component accepts.
+which lets us define the attributes which the component accepts.
 This is useful for providing defaults, error checking as well as documentation.
 
 Components can also be annotated with the "slots" that it accepts,
@@ -225,7 +226,7 @@ def step_list(assigns) do
 end
 #+end_src
 
-We begin by adding padding between the list items
+We begin by adding padding between the list items.
 
 #+begin_src diff
      <ol>
@@ -451,7 +452,7 @@ And replace the placeholder...
 
 The component is complete.
 
-Here is the extended example of using it that appeared in the beginning of the article.
+Here is the extended example that appeared in the beginning of the article.
 
 #+begin_src heex
 <.step_list>
