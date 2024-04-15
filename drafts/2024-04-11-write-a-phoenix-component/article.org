@@ -23,7 +23,7 @@ What you will learn:
 Assumed Knowledge:
 - HTML & CSS
 - Tailwind CSS classes won't be explained, but the desired effect will be
-- how to setup a project with phoenix and LiveView
+- how to setup a project with Phoenix and LiveView
 
 ** Intro to HEEx and Phoenix Components
 
