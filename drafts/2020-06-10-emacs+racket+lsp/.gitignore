@@ -2,3 +2,6 @@
 lsp
 out
 !static/*.css
+*.css
+*.html
+*.js
