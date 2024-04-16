@@ -1,0 +1,7 @@
+#+begin_src sh :results none
+sbcl --noinform \
+     --non-interactive \
+     --load index.lisp \
+     --eval '(write-index)' \
+     > index.html
+#+end_src
