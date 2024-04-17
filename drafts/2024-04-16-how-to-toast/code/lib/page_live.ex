@@ -14,6 +14,21 @@ defmodule Toast.PageLive do
       >
         Copy Link
       </button>
+
+      <.toast />
+      <template id="toast-template">
+        <.toast />
+      </template>
+    </div>
+    """
+  end
+
+  def toast(assigns) do
+    ~H"""
+    <div class="fixed left-0 bottom-0 w-full px-8 mb-8">
+      <div class="bg-gray-800 text-white px-3 py-2 w-full rounded-sm animate-popup">
+        You did it!
+      </div>
     </div>
     """
   end
