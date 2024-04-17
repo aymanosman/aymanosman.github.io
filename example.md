@@ -1,5 +1,6 @@
 ---
 title: Example
+render_with_liquid: false
 ---
 # This is an example.
 
@@ -17,7 +18,7 @@ def step_list(assigns) do
 
   ~H"""
     <ol>
-      <li :for={item, index <- Enum.with_index(@item)} class="relative pb-10">
+      <li :for={{item, index} <- Enum.with_index(@item)} class="relative pb-10">
         <div
           :if={index != @last_index}
           class={[
