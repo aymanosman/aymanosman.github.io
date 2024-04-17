@@ -36,11 +36,16 @@ I will treat them as one, for the purpose of this article.
 
 HEEx provides a way to render literal text
 
-    ~<span>hello world</span>~
+#+begin_src heex
+<span>hello world</span>
+#+end_src
+
 
 as well as interpolate or embed elixir code into the text
 
-    ~<span>hello <%= name %></span>~
+#+begin_src heex
+<span>hello <%= name %></span>
+#+end_src
 
 It lets you embed more than just variables,
 and has support for embedding elixir control constructs
@@ -70,11 +75,15 @@ That means making sure tags are properly closed and the syntax of attributes is 
 To that end, there is a special syntax for interpolating values in attributes.
 It is not valid to write:
 
-~<span class="<%= color %>">~
+#+begin_src heex
+<span class="<%= color %>">
+#+end_src
 
 instead, one must write
 
-~<span class={color}>hello world</span>~
+#+begin_src heex
+<span class={color}>
+#+end_src
 
 HEEx provides some conveniences to express patterns like the for loop above.
 One could write instead:
@@ -91,11 +100,15 @@ They receive a mandatory single argument that must be called ~assigns~.
 They are invoked inside of other templates using a special syntax.
 For functions which are in scope, one can use the following syntax.
 
-    ~<.greeting name="Ayman" />~
+#+begin_src heex
+<.greeting name="Ayman" />
+#+end_src
 
 It is also possible to invoke a function component from an external module.
 
-    ~<Other.greeting name="Ayman" />~
+#+begin_src heex
+<Other.greeting name="Ayman" />
+#+end_src
 
 The above component could be defined like this:    
 
