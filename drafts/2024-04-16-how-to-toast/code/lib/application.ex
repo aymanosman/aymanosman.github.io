@@ -3,6 +3,7 @@ defmodule Toast.Application do
 
   def start(_type, _args) do
     children = [
+      {Phoenix.PubSub, name: Toast.PubSub},
       Toast.Endpoint
     ]
 

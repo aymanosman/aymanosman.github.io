@@ -23,7 +23,9 @@ defmodule Toast.MixProject do
       {:phoenix, "~> 1.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_view, "~> 0.0"},
-      {:floki, "~> 0.0", only: :test}
+      {:phoenix_live_reload, "~> 1.0"},
+      {:floki, "~> 0.0", only: :test},
+      {:esbuild, "~> 0.0", runtime: Mix.env() == :dev}
     ]
   end
 end

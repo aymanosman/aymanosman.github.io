@@ -1,3 +1,4 @@
 /.lexical
 /deps
 /_build
+/priv/static/assets

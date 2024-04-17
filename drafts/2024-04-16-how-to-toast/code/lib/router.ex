@@ -4,7 +4,9 @@ defmodule Toast.Router do
   import Phoenix.LiveView.Router
 
   pipeline :browser do
+    plug :fetch_session
     plug :put_root_layout, {Toast.Layouts, :root}
+    plug :protect_from_forgery
   end
 
   scope "/" do

@@ -16,6 +16,7 @@ config :toast, Toast.Endpoint,
   ],
   http: [port: port],
   secret_key_base: "6eHCc3Lj/4XbS9lzcpi8PbS6axE0Ycv2PfTPgcZZTEsabYkS289NsNG4BikCzWV/",
+  pubsub_server: Toast.PubSub,
   live_view: [signing_salt: "F8bLAINDFWGMAQAm"]
 
 if config_env() == :test do

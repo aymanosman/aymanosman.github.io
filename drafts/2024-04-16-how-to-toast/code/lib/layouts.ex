@@ -6,6 +6,8 @@ defmodule Toast.Layouts do
 
   import Phoenix.Component
 
+  import Phoenix.Controller, only: [get_csrf_token: 0]
+
   def root(assigns) do
     ~H"""
     <!DOCTYPE html>
@@ -13,8 +15,11 @@ defmodule Toast.Layouts do
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content={get_csrf_token()} />
         <.live_title><%= assigns[:page_title] || "Toast" %></.live_title>
-        <link rel="stylesheet" href={~p"/assets/app.css"} />
+        <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+        <script phx-track-static defer type="text/javascript" src={~p"/assets/app.js"}>
+        </script>
       </head>
       <body>
         <%= @inner_content %>

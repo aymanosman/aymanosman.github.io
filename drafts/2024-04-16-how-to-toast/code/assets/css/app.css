@@ -1,0 +1,84 @@
+@import "normalize.css";
+
+html {
+    --blue-500: rgb(59 130 246);
+}
+
+button {
+    transition-property: transform;
+}
+
+button:hover:active,
+button:focus:active {
+    transform: scale(0.98);
+}
+
+.animate-pop {
+    animation: pop 0.25s ease-out;
+}
+
+.animate-ping {
+    animation: ping 1s ease-out infinite;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.bg-blue-500 {
+    background-color: var(--blue-500);
+}
+
+.px-3 {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.py-2 {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.text-white {
+    color: white;
+}
+
+.rounded-md {
+    border-radius: 0.5em;
+}
+
+.flex {
+    display: flex;
+}
+
+
+@keyframes pop {
+    0% {
+        transform: scale(0.98);
+    }
+    40% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
