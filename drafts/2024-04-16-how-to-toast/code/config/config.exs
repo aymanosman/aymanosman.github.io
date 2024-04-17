@@ -38,6 +38,7 @@ config :tailwind,
   version: "3.4.0",
   toast: [
     args: ~w(
+      --config=tailwind.config.js
       --input=css/app.css
       --output=../priv/static/assets/app.css
     ),
