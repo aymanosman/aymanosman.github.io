@@ -4,14 +4,14 @@
 
 @keyframes popup {
     0% {
-        transform: scale(0.98), translateY(100%);
+        transform: scale(0.98) translateY(100%);
         opacity: 0;
     }
     40% {
         transform: scale(1.02);
     }
     100% {
-        transform: scale(1.00), translateY(0%);
+        transform: scale(1.00) translateY(0%);
         opacity: 1;
     }
 }
