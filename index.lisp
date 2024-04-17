@@ -1,7 +1,7 @@
 (defvar *html-pretty* t)
 (defvar *html-stream* (make-synonym-stream '*standard-output*))
 
-(defun html-escape (string)
+(defun %html-escape (string)
   (flet ((write-escape (string)
            (format *html-stream* "&~A;" string)))
     (with-output-to-string (output)
@@ -11,6 +11,15 @@
                  (#\> (write-escape "gt"))
                  (otherwise
                   (write-char char *html-stream*)))))))
+
+(defun html-escape (string)
+  (%html-escape string))
+
+(define-compiler-macro html-escape (form)
+  (typecase form
+    (string (with-output-to-string (*html-stream*)
+              (%html-escape form)))
+    (otherwise form)))
 
 (defun write-attrs (attrs)
   (labels ((write-attr-name (name)
@@ -28,15 +37,19 @@
     (loop for (name value) on attrs by #'cddr
           do (write-attr name value))))
 
+;; https://developer.mozilla.org/en-US/docs/Glossary/Void_element
+(defvar *html-void-elements* '("area" "base" "br" "col" "embed" "hr" "img"
+                               "input" "link" "meta" "source" "track" "wbr"))
+
 (defun write-element (name attrs content &key (stream *html-stream*) (pretty *html-pretty*))
   (format stream "<~A" name)
   (write-attrs attrs)
   (format stream ">")
   (when pretty (terpri stream))
   (cond
-    ((member name '("link") :test 'equal)
+    ((member name *html-void-elements* :test 'equal)
      (unless (null content)
-       (warn "link element should not have a body")))
+       (warn "~A void-element should not have a body" name)))
     (t
      (when content
        (funcall content))
@@ -47,15 +60,31 @@
   (check-type name string)
   `(write-element ,name (list ,@attrs)
                   ,(cond
-                     ((member name '("link") :test 'equal)
+                     ((member name *html-void-elements* :test 'equal)
                       nil)
                      (t
-                      `(lambda () ,@body)))))
+                      `(lambda ()
+                         ,@(mapcar (lambda (child)
+                                     (typecase child
+                                       (string
+                                        `(progn
+                                           (write-string (html-escape ,child) *html-stream*)
+                                           (when *html-pretty* (terpri *html-stream*))))
+                                       (otherwise
+                                        child)))
+                                   body))))))
 
 (defun write-index ()
   (format *html-stream* "<!doctype html>~%")
-  (with-element ("html")
+  (with-element ("html" :lang "en")
     (with-element ("head")
+      (with-element ("meta" :charset "utf-8"))
+      (with-element ("meta" :http-equiv "x-ua-compatible" :content "ie=edge"))
+      (with-element ("meta" :name "viewport" :content "width=device-width, initial-scale=1.0"))
+
+      (with-element ("title")
+        "Index")
+
       (with-element ("link" :rel "preconnect" :href "https://fonts.googleapis.com"))
       (with-element ("link" :rel "preconnect" :href "https://fonts.gstatic.com" :crossorigin t))
       (with-element ("link" :rel "stylesheet" :href "https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap"))
@@ -64,11 +93,14 @@
       (with-element ("script" :src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"))
       (with-element ("script" :src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/elixir.min.js"))
       (with-element ("script")
-        (write-string "hljs.highlightAll();" *html-stream*)))
+        "hljs.highlightAll();"))
     (with-element ("body")
-      (format *html-stream* "Hello World~%")
+      "Hello World"
       (let ((*html-pretty* nil))
         (with-element ("pre")
           (with-element ("code" :class "language-elixir")
-            (write-string (html-escape "def button (assigns) do ~H\"<span>Hello HEEx</span>\"")
-                          *html-stream*)))))))
+            "def button(assigns) do
+  ~H\"\"\"
+  <span>Hello HEEx</span>
+  \"\"\"
+end"))))))
