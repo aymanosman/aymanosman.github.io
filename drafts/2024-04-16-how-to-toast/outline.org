@@ -1,0 +1,40 @@
+
+#+begin_src html
+<template>
+</template>
+#+end_src
+
+#+begin_src javascript
+class ToastElement extends HTMLElement() {
+  connectedCallback()
+  disconnectedCallback()
+}
+
+customElements.define("my-toast", ToastElement);
+#+end_src
+
+#+begin_src javascript
+class ToastManager {
+ _toasts = new Map();
+
+ create(message, options) {
+   // 
+ }
+}
+#+end_src
+
+Using it
+
+#+begin_src javascript
+window.addEventListener("myapp:clip", (event) => {
+  clipboard.copy(event.detail.text);
+  toast.create("Copied to clipboard", {distinct: "clip-toast"});
+})
+#+end_src
+
+
+Example, copy to clipboard
+
+#+begin_src elixir
+JS.dispatch("myapp:clip")
+#+end_src
