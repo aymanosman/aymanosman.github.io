@@ -22,7 +22,8 @@ defmodule Toast.MixProject do
       {:bandit, "~> 1.0"},
       {:phoenix, "~> 1.0"},
       {:phoenix_html, "~> 4.0"},
-      {:phoenix_live_view, "~> 0.0"}
+      {:phoenix_live_view, "~> 0.0"},
+      {:floki, "~> 0.0", only: :test}
     ]
   end
 end

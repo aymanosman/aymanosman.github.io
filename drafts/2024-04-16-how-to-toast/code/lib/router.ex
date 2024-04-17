@@ -3,5 +3,13 @@ defmodule Toast.Router do
 
   import Phoenix.LiveView.Router
 
-  live "/", Toast.PageLive
+  pipeline :browser do
+    plug :put_root_layout, {Toast.Layouts, :root}
+  end
+
+  scope "/" do
+    pipe_through :browser
+
+    live "/", Toast.PageLive
+  end
 end
