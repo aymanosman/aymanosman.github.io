@@ -4,5 +4,5 @@ sbcl --noinform \
      --load html \
      --load index \
      --eval '(write-index)' \
-     > index.html
+     > _site/index.html
 #+end_src

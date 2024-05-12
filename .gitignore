@@ -4,3 +4,5 @@
 compiled
 
 *.fasl
+
+/_site
