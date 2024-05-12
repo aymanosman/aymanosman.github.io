@@ -19,7 +19,7 @@
       (with-element ("script")
         "hljs.highlightAll();"))
     (with-element ("body")
-      "Hello World"
+      "Hello Louise"
       (let ((*html-pretty* nil))
         (with-element ("pre")
           (with-element ("code" :class "language-elixir")
