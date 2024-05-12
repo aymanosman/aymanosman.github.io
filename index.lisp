@@ -1,16 +1,21 @@
 (defvar *html-pretty* t)
 (defvar *html-stream* (make-synonym-stream '*standard-output*))
 
-(defun %html-escape (string)
-  (flet ((write-escape (string)
-           (format *html-stream* "&~A;" string)))
-    (with-output-to-string (output)
-      (loop for char across string
-            do (case char
-                 (#\< (write-escape "lt"))
-                 (#\> (write-escape "gt"))
-                 (otherwise
-                  (write-char char *html-stream*)))))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  ;; https://developer.mozilla.org/en-US/docs/Glossary/Void_element
+  (defvar *html-void-elements* '("area" "base" "br" "col" "embed" "hr" "img"
+                                 "input" "link" "meta" "source" "track" "wbr"))
+
+  (defun %html-escape (string)
+    (flet ((write-escape (string)
+             (format *html-stream* "&~A;" string)))
+      (with-output-to-string (output)
+        (loop for char across string
+              do (case char
+                   (#\< (write-escape "lt"))
+                   (#\> (write-escape "gt"))
+                   (otherwise
+                    (write-char char *html-stream*))))))))
 
 (defun html-escape (string)
   (%html-escape string))
@@ -36,10 +41,6 @@
                 (format *html-stream* "=~S" value)))))
     (loop for (name value) on attrs by #'cddr
           do (write-attr name value))))
-
-;; https://developer.mozilla.org/en-US/docs/Glossary/Void_element
-(defvar *html-void-elements* '("area" "base" "br" "col" "embed" "hr" "img"
-                               "input" "link" "meta" "source" "track" "wbr"))
 
 (defun write-element (name attrs content &key (stream *html-stream*) (pretty *html-pretty*))
   (format stream "<~A" name)
