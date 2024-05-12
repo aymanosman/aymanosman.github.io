@@ -1,40 +1,80 @@
+Working backwards from usage.
 
-#+begin_src html
-<template>
-</template>
+#+begin_src heex
+<button phx-click={JS.dispatch("myapp:clip", detail: %{text: "/some/link"})}>Copy Link</button>
 #+end_src
 
 #+begin_src javascript
-class ToastElement extends HTMLElement() {
-  connectedCallback()
-  disconnectedCallback()
-}
+window.addEventListener("myapp:clip", (event) => {
+  navigator.clipboard.writeText(event.detail.text);
+  toast.create("Copied to clipboard");
+})
+#+end_src
 
+and then, implementation
+
+#+begin_src js
+const toast = {
+  create: function(message) {
+    document.body.appendChild(this.build(message));
+  }
+  build: function(message) {
+    let element = document.createElement("my-toast");
+    element.setAttribute("message", message);
+    return element;
+  }
+}
+#+end_src
+
+#+begin_src js
 customElements.define("my-toast", ToastElement);
 #+end_src
 
 #+begin_src javascript
-class ToastManager {
- _toasts = new Map();
-
- create(message, options) {
-   // 
- }
+class ToastElement extends HTMLElement() {
+  connectedCallback() {
+    let template = new ToastTemplate();
+    let assigns = {
+      message: this.getAttribute("message");
+    }
+    this.appendChild(template.render(assigns));
+  }
 }
 #+end_src
 
-Using it
-
 #+begin_src javascript
-window.addEventListener("myapp:clip", (event) => {
-  clipboard.copy(event.detail.text);
-  toast.create("Copied to clipboard", {distinct: "clip-toast"});
-})
+class ToastTemplate {
+  constructor() {
+    this.template = document.getElementById("toast-template");
+  }
+
+  render(assigns) {
+    let clone = this.template.content.cloneNode(true);
+    for (let slot of clone.querySelectorAll("slot")) {
+      let name = slot.getAttribute("name");
+      if (assigns[name]) slot.replaceWith(assigns[name])
+    }
+    return clone;
+  }
+}
 #+end_src
 
-
-Example, copy to clipboard
+#+begin_src heex
+<template id="toast-template">
+  <.toast />
+</template>
+#+end_src
 
 #+begin_src elixir
-JS.dispatch("myapp:clip")
+def toast(assigns) do
+  ~H"""
+  <div>
+    <div>
+      <slot name="message" />
+    </div>
+  </div>
+  """
+end
 #+end_src
+
+Example, copy to clipboard
