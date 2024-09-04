@@ -19,7 +19,6 @@
       (with-element ("script")
         "hljs.highlightAll();"))
     (with-element ("body")
-      "Hello Louise"
       (let ((*html-pretty* nil))
         (with-element ("pre")
           (with-element ("code" :class "language-elixir")
@@ -27,4 +26,8 @@
   ~H\"\"\"
   <span>Hello HEEx</span>
   \"\"\"
-end"))))))
+end")))
+      (let ((*html-pretty* nil))
+        (with-element ("pre")
+          (with-element ("code" :class "language-heex")
+            "<span>Hello HEEx</span>"))))))
